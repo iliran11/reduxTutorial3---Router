@@ -1,25 +1,44 @@
-import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {fetchPosts} from '../actions/index';
-import {Link} from 'react-router';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { fetchPosts } from '../actions/index';
+import { Link } from 'react-router';
 
 class PostIndex extends Component {
-    componentWillMount() {
-      this.props.fetchPosts();
-    }
-    render() {
+  componentWillMount() {
+    this.props.fetchPosts();
+  }
+  //TODO: Handle exception when deleting the last post.
+  renderPosts() {
+    try {
+      return this.props.posts.map((post) => {
         return (
-            <div>
-              <div className="text-xs-right">
-                <Link to = "/posts/new" className="btn btn-primary">
-                  Add a Post
-                </Link>
-              </div>
-              post index ..
-
-            </div>
+          <li className='list-group-item' key={post.id}>
+            <Link to={'posts/' + post.id}>
+              <strong>{post.title}</strong>
+              <span className='pull-xs-right'>{post.categories}</span>
+            </Link>
+          </li>
         )
+      })
+    } catch (e) {
+      console.log(e);
     }
+  }
+  render() {
+    return (
+      <div>
+        <div className="text-xs-right">
+          <Link to="/posts/new" className="btn btn-primary">Add a Post</Link>
+        </div>
+        <h3>Posts</h3>
+        <ul className='list-group'>
+          {this.renderPosts()}
+        </ul>
+      </div>
+    )
+  }
 }
-
-export default connect(null, {fetchPosts})(PostIndex);
+function mapStateToProps(state) {
+  return { posts: state.posts.all }
+}
+export default connect(mapStateToProps, { fetchPosts })(PostIndex);
